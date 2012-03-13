@@ -13,8 +13,8 @@
 randomChild(profile, Freqs)
 }
 \arguments{
-  \item{profile}{A matrix consisting of 2 columns and nLoci rows. Each entry
-in the matrix is the (coded) allele held by the individual. This
+  \item{profile}{A vector of length 2*nLoci. Each entry
+in the vector is the (coded) allele held by the individual. This
 represents the parent. The relationship is reflexive so it
 does not matter if the profile is a parent or a child.}
   \item{Freqs}{A list containing two lists labelled loci and freqs. The
@@ -22,7 +22,7 @@ second list is a list of vectors containing the allele frequencies of
 each allele at each locus in the multiplex.} 
 }
 \value{
-  A matrix with 2 columns and nLoci rows. Each row represents the
+  A vector with 2*nLoci elements. Each pair of elements represents the
   genotpe of the random individual at that locus. The genotype alleles
   are always ordered so that allele1 <= allele2.
 }

@@ -16,15 +16,15 @@
 randomSib(profile, Freqs)
 }
 \arguments{
-  \item{profile}{A matrix consisting of 2 columns and nLoci rows. Each entry
-in the matrix is the (coded) allele held by the individual. This
-represents the sibling.}
+  \item{profile}{A vector consisting of 2*nLoci elements. Each element
+    in the vector is the (coded) allele held by the individual. This
+    represents the sibling.}
   \item{Freqs}{A list containing two lists labelled loci and freqs. The
 second list is a list of vectors containing the allele frequencies of
 each allele at each locus in the multiplex.} 
 }
 \value{
-  A matrix with 2 columns and nLoci rows. Each row represents the
+  A vector with 2*nLoci elements. Each pair of elements represents the
   genotpe of the random individual at that locus. The genotype alleles
   are always ordered so that allele1 <= allele2.
 }

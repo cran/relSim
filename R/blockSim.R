@@ -19,12 +19,18 @@ blockSim = function(N, Freqs, rel = "UN", ibsthresh = NULL, kithresh = NULL,
         stop("You must specify one or both of ibsthresh or kithresh")
 
     nResults = 0
-    if(is.null(ibsthresh)){
+    if(is.null(ibsthresh) & !is.null(kithresh)){
         nResults = length(kithresh)
         ibsthresh = rep(0, nResults) ## dummy vals
-    }else{
+    }else if(is.null(kithresh) & !is.null(ibsthresh)){
         nResults = length(ibsthresh)
         kithresh = rep(0, nResults)
+    }else{
+        if(length(ibsthresh)!=length(kithresh)){
+            stop("ibsthresh and kithresh must be the same length")
+        }else{
+            nResults = length(ibsthresh)
+        }
     }
 
     if(nResults == 0)

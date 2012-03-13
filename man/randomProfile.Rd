@@ -13,7 +13,7 @@ second list is a list of vectors containing the allele frequencies of
 each allele at each locus in the multiplex.} 
 }
 \value{
-  A matrix with 2 columns and nLoci rows. Each row represents the
+  A vector with 2*nLoci elements. Each pair of elements represents the
   genotpe of the random individual at that locus. The genotype alleles
   are always ordered so that allele1 <= allele2.
 }

@@ -1,7 +1,7 @@
-ae271d8c5e6a7a267dfbd40072e9a45c *DESCRIPTION
+f2068ed0df351ae5abad1b8b556893f1 *DESCRIPTION
 2817134e638bc1f2ef5ff135364dc67d *NAMESPACE
 c3ae03f718eb50191ffe27c4c768a30c *R/IBS.R
-17164593a31908c32292a9d78da3e9cd *R/blockSim.R
+39a58f90e7d3977fa307aa1186530c72 *R/blockSim.R
 ab7070fcfd1cfb00ee4479d06748c7c4 *R/checkFreqs.R
 0fba0cf6a8a41a49b5a274016c38a937 *R/errorRate.R
 bf61695255ad0e9acedc02bba9cc285e *R/estimateQuantile.R
@@ -26,6 +26,7 @@ bc6da5011a8d29c15582630b3b2d0a55 *R/readResults.R
 80ec6fd69af64a305cde25e4537f5b27 *R/sim.R
 1966f00e0e0dda9a903ef0d39c4c8171 *data/USCaucs.rda
 75c5b2f6c5fa2c424a0778135f1882ab *data/fbiCaucs.rda
+fc7ce38941ac6fa661b66bb314a2d502 *desktop.ini
 95c8043905d2f6a0591626e17eddbed5 *man/IBS.Rd
 a6e9f2201f67bdab7c138405e484c76e *man/USCaucs.Rd
 c150fb635821f49b91a8d0c956f1fdb8 *man/blockSim.Rd
@@ -39,12 +40,12 @@ db18e3a0011bb2a4c9aa5d5cf740183b *man/lrPC.Rd
 32972975760eeda8507f361617c0b432 *man/lrSibDebug.Rd
 e33307bc9d267471186f9df945c7ac67 *man/normalizeFreqs.Rd
 a1045d3a60e6a85748be668601bedbdc *man/print.profile.Rd
-d8a034024c93d1c3079f8e332fc0f01a *man/randomChild.Rd
+b5fb2c71c20c405c7f84050c20ab6fd2 *man/randomChild.Rd
 286dd14964bb900d7e3f6381047ecf51 *man/randomPCPairs.Rd
-cd28013bce06270c5af3dcd76e61fd49 *man/randomProfile.Rd
+98f2e155b77dbd10a4e00e343d18ff70 *man/randomProfile.Rd
 e98163e1512843ea6e696eef09dc75bf *man/randomProfilePairs.Rd
 e0cd1f9ebb45a451c3f56d203d30640d *man/randomSample.Rd
-c2c4acdbdb7cc4789f1b9805d4796bd7 *man/randomSib.Rd
+8280124fae0d7d16569918cf2ab92487 *man/randomSib.Rd
 0a7ca89e0bdcae269d3e634b0a209fc4 *man/randomSibPairs.Rd
 f20cf0221923739563dbd17a815caacb *man/readFreqs.Rd
 e7bd7eea3532f2c2f34c4ca10587fbdf *man/readResults.Rd
