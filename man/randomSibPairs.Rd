@@ -31,7 +31,7 @@ each allele at each locus in the multiplex.}
 \examples{
 data(fbiCaucs)
 P = randomSibPairs(fbiCaucs)
-P$prof1
-P$prof2
+P$sib1
+P$sib2
 }
 \author{James M. Curran}
