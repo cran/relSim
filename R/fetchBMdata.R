@@ -7,10 +7,15 @@ fetchBMdata = function(){
     Lines = readLines(f1)
     close(f1)
 
-    ## Data is on a single line, number 432, in this file
-
-    Lines = Lines[432]
+#     ## Data is on a single line, number 432, in this file
+# 
+#     Lines = Lines[432]
+#     Lines = unlist(strsplit(Lines, "<br />"))
+    ## 2014-03-12 The format of the data has changed again. I will search for the start of the data 'Table 1' and the end '3409'
     Lines = unlist(strsplit(Lines, "<br />"))
+    i1 = grep("Table 1.", Lines)
+    i2 = grep("^3409", Lines)
+    Lines = Lines[i1:i2]
     Lines = gsub("[&][#]13;", "", Lines)
     Lines = gsub("<[/]*p>","",Lines)
 
@@ -91,10 +96,11 @@ fetchBMdata = function(){
                          freqs = vector(mode = "list", length = nLoci))
 
         names(db[[pop]]$freqs) = Loci
-
+        #browser()
+        
         for(loc in 1:nLoci){
             db[[pop]]$freqs[[loc]] = rep(0, length(Alleles[[loc]]))
-            names(db[[pop]]$freqs[[loc]]) = names(Alleles[[loc]])
+            names(db[[pop]]$freqs[[loc]]) = Alleles[[loc]]
         }
 
         popLines = strsplit(Lines[i1[pop]:i2[pop]],"[\t ]+")
