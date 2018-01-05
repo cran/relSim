@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <map>
 using namespace Rcpp;
 
 int profIBS(IntegerVector::const_iterator Prof){
@@ -161,12 +162,12 @@ int IBS(IntegerVector::const_iterator Prof1, IntegerVector::const_iterator Prof2
   return s;
 }
 
-// [[Rcpp::export(".IBS")]]
+// [[Rcpp::export(".IBS_Caller")]]
 int IBS_Caller(IntegerVector Prof1, IntegerVector Prof2, int nLoci){
   return IBS(Prof1.begin(), Prof2.begin(), nLoci);
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".randomProfiles")]]
 IntegerVector randomProfiles(List listFreqs, int nBlockSize = 1000){
   int nLoci = listFreqs.size();
   int nLoc;
@@ -523,12 +524,10 @@ double prob(IntegerVector Prof, List listFreqs){
   double dProd = 1;
   
   for(nLoc = 0; nLoc < nLoci; nLoc++){
-    double lprob;
     int i1 = 2*nLoc;
     NumericVector Freq = as<NumericVector>(listFreqs[nLoc]);
     
     dProd *= locusProb(Prof.begin() + i1, Freq);
-    nLoc++;
   }
   
   return dProd;
@@ -719,3 +718,215 @@ List blockStats(IntegerVector Prof1, IntegerVector Prof2, int nProf,
   }
   return results;
 }
+
+IntegerVector score(IntegerVector& Profiles, int nContributors, int nLoci){
+  
+  IntegerVector vResults;
+  int nLoc, nContrib;
+  
+  for(nLoc = 0; nLoc < nLoci; nLoc++){
+    std::map<int, int> mapCounts;
+    
+    for(nContrib = 0; nContrib < nContributors; nContrib++){
+      int nOffset = 2 * nLoci * nContrib;
+      int nA1 = Profiles[nOffset + 2 * nLoc];
+      int nA2 = Profiles[nOffset + 2 * nLoc + 1];
+      
+      // doesn't matter what we count because it's presence we're interested in 
+      mapCounts[nA1] = 1;
+      mapCounts[nA2] = 1;
+    }
+    
+    vResults.push_back(mapCounts.size());
+  }
+  
+  return vResults;
+}
+
+// [[Rcpp::export(".simNpersonMixture")]]  
+NumericMatrix simNpersonMixture(List listFreqs, int numContributors, int numIterations){
+  
+  int i, nLoc;
+  int nLoci = listFreqs.size();
+  NumericMatrix results(nLoci, 2 * numContributors);
+  
+  for(i = 0; i < numIterations; i++){
+    
+    // CreateProfiles(Profiles, nContributors, popfreqs, nLoci);
+    IntegerVector Profiles = randomProfiles(listFreqs, numContributors);
+    IntegerVector vResults = score(Profiles, numContributors, nLoci);
+    
+    for(nLoc = 0; nLoc < nLoci; nLoc++){
+      int nAlleles = vResults[nLoc] - 1;
+      results(nLoc, nAlleles)++;
+    }  
+  }
+
+  for(nLoc = 0; nLoc < nLoci; nLoc++){
+    for(i = 0; i < 2 * numContributors; i++){
+      results(nLoc, i) /=  numIterations;
+    }
+  }
+  
+  return results;
+}
+
+class LR{
+public:
+  double dLR;
+  int nIDRelative;
+  int nIDD;
+public:
+  LR(){};
+  LR(const double lr, const int idd, const int rel){
+    dLR = lr; 
+    nIDD = idd; 
+    nIDRelative = rel;
+  }
+};
+
+//' Search a database for siblings or children
+//' 
+//' This function searches a database of profiles for either a sibling or a child
+//' @param profiles an integer vector of stacked profiles representing the database. This vector has \eqn{2NL} entries, where N is the number of
+//' profiles and L is the number of loci.
+//' @param siblings an integer vector of stacked profiles representing the siblings of the profiles in database. 
+//' The first entry is a sibling of the first entry in \code{profiles} and so on. This vector has \eqn{2NL} entries, where N is the number of
+//' profiles and L is the number of loci.
+//' @param children an integer vector of stacked profiles representing the children of the profiles in database. 
+//' The first entry is a child of the first entry in \code{profiles} and so on. This vector has \eqn{2NL} entries, where N is the number of
+//' profiles and L is the number of loci.
+//' @param listFreqs is a set of allele frequencies representing a particular multiplex. The function assumes that that loci in the profiles
+//' are in the same order as the loci in this list. The data structure is a \code{List} of \code{NumericVector}'s.
+//' @param step A step size for progress reporting, i.e. print out progress every \code{step} iterations. If \code{step = -1}, then there is no printing.
+//' 
+//' @return a \code{List} containing two dataframes, one called \code{sibs} and one called \code{children}. Each dataframe has results from searching for
+//' either the sibling or the child in the database. For each entry there is a record of which profile gave the highest LR (and its value),
+//' and the position of the actual sibling or parent/child in the database (and its respective LR).
+//' 
+//' @author James Curran
+//' @export
+// [[Rcpp::export]]  
+List famSearch(IntegerVector& profiles, IntegerVector& siblings, IntegerVector& children, List& listFreqs, int step){
+  
+  int nLoci = listFreqs.size();
+  int nProfiles = profiles.size() / (2 * nLoci);
+  
+  //std::vector<LR> sibResults(nProfiles);
+  //std::vector<LR> childResults(nProfiles);
+  
+  NumericVector sibTopRankedLR(nProfiles), sibTopRankedID(nProfiles), sibActualLR(nProfiles), sibActualRank(nProfiles);
+  NumericVector childTopRankedLR(nProfiles), childTopRankedID(nProfiles), childActualLR(nProfiles), childActualRank(nProfiles);
+  
+  int ctr1, ctr2;
+  
+  ctr1 = ctr2 = 0;
+  
+  for(int prof1 = 0; prof1 < nProfiles; prof1++){
+    int nOffsetRel = 2 * nLoci * prof1;
+    IntegerVector::const_iterator iSib = siblings.begin() + nOffsetRel;
+    IntegerVector::const_iterator iChild = children.begin() + nOffsetRel;
+
+    double dSibLRMax, dChildLRMax;
+    double dSibLR, dChildLR;
+    int nSibRank, nChildRank;
+    int nSibTopRankID, nChildTopRankID;
+
+    dSibLRMax = lrSib(profiles.begin() + (2 * nLoci * prof1), iSib, listFreqs);
+    dChildLRMax = lrPC(profiles.begin() + (2 * nLoci * prof1), iChild, listFreqs);
+    nSibRank = nChildRank = 0;
+    nSibTopRankID = nChildTopRankID = prof1;
+
+    for(int prof2 = 0; prof2 < nProfiles; prof2++){
+      int nOffset = 2 * nLoci * prof2;
+      IntegerVector::const_iterator iProf = profiles.begin() + nOffset;
+
+      dSibLR = lrSib(iProf, iSib, listFreqs);
+      dChildLR = lrPC(iProf, iChild, listFreqs);
+
+      if(dSibLR > dSibLRMax){
+        dSibLRMax = dSibLR;
+        nSibTopRankID = prof1 + 1;
+        nSibRank++;
+      }
+
+      if(dChildLR > dChildLRMax){
+        dChildLRMax = dChildLR;
+        nChildTopRankID = prof1 + 1;
+        nChildRank++;
+      }
+    }
+    
+    ctr2 = ctr2 + 1;
+    
+    if(step > 0 && ctr2 == step){
+      ctr1 = ctr1 + 1;
+      Rprintf("%d\n", ctr1);
+      ctr2 = 0;
+    }
+
+
+    sibTopRankedID[prof1] = nSibTopRankID;
+    sibTopRankedLR[prof1] = dSibLRMax;
+    sibActualRank[prof1] = nSibRank + 1;
+    sibActualLR[prof1] = lrSib(profiles.begin() + (2 * nLoci * prof1), iSib, listFreqs);
+
+    childTopRankedID[prof1] = nChildTopRankID;
+    childTopRankedLR[prof1] = dChildLRMax;
+    childActualRank[prof1] = nChildRank + 1;
+    childActualLR[prof1] = lrPC(profiles.begin() + (2 * nLoci * prof1), iChild, listFreqs);
+    
+    // for(int prof2 = 0; prof2 < nProfiles; prof2++){
+    //   int nOffset = 2 * nLoci * prof2;
+    //   IntegerVector::const_iterator iProf = profiles.begin() + nOffset;
+    //   
+    //   sibResults[prof2] = LR(lrSib(iProf, iSib, listFreqs), prof1, prof2);
+    //   childResults[prof2]= LR(lrPC(iProf, iChild, listFreqs), prof1, prof2);
+    // }
+    // 
+    // std::sort(sibResults.begin(), sibResults.end(), [](const LR &a, const LR &b) -> bool {
+    //   return a.dLR > b.dLR;});
+    // std::sort(childResults.begin(), childResults.end(), [](const LR &a, const LR &b) -> bool {
+    //   return a.dLR > b.dLR;});
+    // 
+    // sibTopRankedID[prof1] = sibResults[0].nIDD + 1; //The +1's are to get rid of 0 based ranks
+    // sibTopRankedLR[prof1] = sibResults[0].dLR;
+    // 
+    // childTopRankedID[prof1] = childResults[0].nIDD + 1;
+    // childTopRankedLR[prof1] = childResults[0].dLR;
+    // 
+    // int i1 = 0;
+    // while(sibResults[i1].nIDD != prof1){
+    //   i1++;
+    // }
+    // 
+    // sibActualRank[prof1] = i1 + 1;
+    // sibActualLR[prof1] = sibResults[i1].dLR;
+    // 
+    // int i2 = 0;
+    // while(childResults[i2].nIDD != prof1){
+    //   i2++;
+    // }
+    // 
+    // childActualRank[prof1] = i2 + 1;
+    // childActualLR[prof1] = childResults[i2].dLR;
+    
+  //   ctr = ctr + 1;
+  } 
+  Rprintf("\n");
+  
+  List results;
+
+  results["sibs"] = DataFrame::create(_["topRankedID"] = sibTopRankedID,
+                                           _["topRankedLR"] = sibTopRankedLR,
+                                           _["actualRank"] = sibActualRank,
+                                           _["actualLR"] = sibActualLR);
+
+  results["children"] = DataFrame::create(_["topRankedID"] = childTopRankedID,
+                                  _["topRankedLR"] = childTopRankedLR,
+                                  _["actualRank"] = childActualRank,
+                                  _["actualLR"] = childActualLR);
+
+  return(results);
+}
+
