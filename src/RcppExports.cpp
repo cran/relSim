@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // breed
 IntegerVector breed(IntegerVector Parents, int ns, int Ns, int nLoci);
 RcppExport SEXP _relSim_breed(SEXP ParentsSEXP, SEXP nsSEXP, SEXP NsSEXP, SEXP nLociSEXP) {
@@ -256,6 +261,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// allPairsLR
+NumericVector allPairsLR(IntegerVector Profiles, List listFreqs, int nCode);
+RcppExport SEXP _relSim_allPairsLR(SEXP ProfilesSEXP, SEXP listFreqsSEXP, SEXP nCodeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type Profiles(ProfilesSEXP);
+    Rcpp::traits::input_parameter< List >::type listFreqs(listFreqsSEXP);
+    Rcpp::traits::input_parameter< int >::type nCode(nCodeSEXP);
+    rcpp_result_gen = Rcpp::wrap(allPairsLR(Profiles, listFreqs, nCode));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_relSim_breed", (DL_FUNC) &_relSim_breed, 4},
@@ -276,6 +294,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_relSim_blockStats", (DL_FUNC) &_relSim_blockStats, 5},
     {"_relSim_simNpersonMixture", (DL_FUNC) &_relSim_simNpersonMixture, 3},
     {"_relSim_famSearch", (DL_FUNC) &_relSim_famSearch, 5},
+    {"_relSim_allPairsLR", (DL_FUNC) &_relSim_allPairsLR, 3},
     {NULL, NULL, 0}
 };
 
