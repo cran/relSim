@@ -1,4 +1,4 @@
-dbd63c03ddafda470646ecaf0e1a21b1 *DESCRIPTION
+f1729b05f7ec6d404145cec0f97fac7a *DESCRIPTION
 c02ee6bf5d3e31d540127a050378736c *NAMESPACE
 dbd4431d7465760ca6686f43980553be *R/IBS.R
 5cbdadd0daa7c4a55be66150e174ff92 *R/Importance.R
@@ -10,6 +10,7 @@ a0310c43121f1b965c3f91c9a3053243 *R/breedFst.R
 d9c8738d0eb2c6060c7e9914707ce7b8 *R/calcFst.R
 fca5001a847fa93a2308d377350fd53f *R/checkFreqs.R
 8212ceba4a84f832645f06704ffb0ca2 *R/combinePops.R
+b883bf12701bbd0f6c3887482732cb92 *R/concatProfiles.R
 50659706b2cbd7694766d8cbd990def0 *R/data-description.R
 89da8a4921b7c4321638a79339daa779 *R/errorRate.R
 99e03e66603eb50846bea4ea7ecc6130 *R/estimateQuantile.R
@@ -35,7 +36,7 @@ ce85e715b1cad67588c9cd801a2fadee *R/randomProfile.R
 37bc5707b4af2b4af853bb6b9073b296 *R/randomSib.R
 566feef64c0bc85063c820dfb74f37fc *R/randomSibPairs.R
 92a8b9007026a14698dbf1cd2bb818a6 *R/readFreqs.R
-024e7f1e9c4039e6f61c9312c9a3d751 *R/readProfiles.R
+64fcc1eb251090beb2b148f1971a50f2 *R/readProfiles.R
 51d369f5201391550f0cb42bb9457927 *R/readResults.R
 9dafd8737173b74a1a907cf640ff52ac *R/relSim-package.R
 3b66472aefc95d8740131e07b330b621 *R/sim.R
@@ -80,7 +81,7 @@ a9f6f3dfa8df063aff570d76ba9c1f16 *man/lrSibDebug.Rd
 77cf19bed1d5e76bba20c69f4a629177 *man/randomSib.Rd
 dc0f9244658a2ddea694277d77cc871a *man/randomSibPairs.Rd
 248bdc049ba74141f63d156edcd26876 *man/readFreqs.Rd
-9cbbad0893a3fc42a3b9ab53e9410fdd *man/readProfiles.Rd
+1df899315005b83b50c2152896c24bb0 *man/readProfiles.Rd
 d99a2adabc6a44a97e78036ef3e293b2 *man/readResults.Rd
 654b634dcff04a03363b455d1c59e779 *man/relSim.Rd
 88095396dee4b6b4ac40a66299c4787f *man/sim.Rd
@@ -92,4 +93,4 @@ d1ea9fbe47b32e474e7c69d2ac6c2d9c *man/simNpersonMixture.Rd
 928b1b62acaaf0807cad6f1ff1b477b4 *src/breed.cpp
 ae9a090350845555cba8799f9dbc191d *src/calcFst.cpp
 c1f8fe6be1df2caa591538677e223d17 *src/importance.cpp
-ec0154ecf85908309edc855971b9977f *src/relSim.cpp
+dca0c1fddb37648db61eb633e383d1d6 *src/relSim.cpp
